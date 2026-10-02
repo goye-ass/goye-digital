@@ -46,11 +46,13 @@ import { ReceiptModal } from './ReceiptModal';
 interface AdminPortalProps {
   onClose: () => void;
   onRefreshPublicData: () => void;
+  initialView?: 'dashboard' | 'products' | 'new_product' | 'orders' | 'notifications' | 'receipts';
 }
 
 export const AdminPortal: React.FC<AdminPortalProps> = ({
   onClose,
-  onRefreshPublicData
+  onRefreshPublicData,
+  initialView = 'dashboard'
 }) => {
   const [adminKey, setAdminKey] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -59,7 +61,20 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
   // Sub-pages: /admin (dashboard), /admin/products, /admin/products/new, /admin/orders, /admin/notifications, /admin/receipts
   const [currentView, setCurrentView] = useState<
     'dashboard' | 'products' | 'new_product' | 'orders' | 'notifications' | 'receipts'
-  >('dashboard');
+  >(initialView);
+
+  const navigateView = (view: 'dashboard' | 'products' | 'new_product' | 'orders' | 'notifications' | 'receipts') => {
+    setCurrentView(view);
+    const path = view === 'dashboard' ? '/admin' : `/admin/${view === 'new_product' ? 'products/new' : view}`;
+    window.history.pushState(null, '', path);
+  };
+
+  const handlePortalClose = () => {
+    if (window.location.pathname.startsWith('/admin')) {
+      window.history.pushState(null, '', '/');
+    }
+    onClose();
+  };
 
   // Filter & Search states
   const [productSearch, setProductSearch] = useState('');
@@ -398,7 +413,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
           <div className="flex items-center gap-2">
             {isAuthenticated && (
               <button
-                onClick={() => setCurrentView('notifications')}
+                onClick={() => navigateView('notifications')}
                 className="relative p-1.5 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-colors cursor-pointer"
                 title="Admin Notifications & Audit Alerts"
               >
@@ -411,7 +426,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
               </button>
             )}
             <button
-              onClick={onClose}
+              onClick={handlePortalClose}
               className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors cursor-pointer"
             >
               <X className="w-5 h-5" />
@@ -467,7 +482,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
             {/* Sidebar */}
             <aside className="w-full md:w-56 bg-[#0e131d] border-b md:border-b-0 md:border-r border-[#1E283D] p-3 flex md:flex-col gap-1 shrink-0 overflow-x-auto">
               <button
-                onClick={() => setCurrentView('dashboard')}
+                onClick={() => navigateView('dashboard')}
                 className={`flex items-center gap-2.5 px-3 py-2 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap cursor-pointer ${
                   currentView === 'dashboard'
                     ? 'bg-[#D4AF37] text-slate-950'
@@ -479,7 +494,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
               </button>
 
               <button
-                onClick={() => setCurrentView('products')}
+                onClick={() => navigateView('products')}
                 className={`flex items-center gap-2.5 px-3 py-2 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap cursor-pointer ${
                   currentView === 'products'
                     ? 'bg-[#D4AF37] text-slate-950'
@@ -493,7 +508,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
               <button
                 onClick={() => {
                   setFormData(initialNewProduct);
-                  setCurrentView('new_product');
+                  navigateView('new_product');
                 }}
                 className={`flex items-center gap-2.5 px-3 py-2 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap cursor-pointer ${
                   currentView === 'new_product'
@@ -506,7 +521,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
               </button>
 
               <button
-                onClick={() => setCurrentView('orders')}
+                onClick={() => navigateView('orders')}
                 className={`flex items-center gap-2.5 px-3 py-2 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap cursor-pointer ${
                   currentView === 'orders'
                     ? 'bg-[#D4AF37] text-slate-950'
@@ -518,7 +533,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
               </button>
 
               <button
-                onClick={() => setCurrentView('notifications')}
+                onClick={() => navigateView('notifications')}
                 className={`flex items-center justify-between px-3 py-2 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap cursor-pointer ${
                   currentView === 'notifications'
                     ? 'bg-[#D4AF37] text-slate-950'
@@ -537,7 +552,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
               </button>
 
               <button
-                onClick={() => setCurrentView('receipts')}
+                onClick={() => navigateView('receipts')}
                 className={`flex items-center justify-between px-3 py-2 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap cursor-pointer ${
                   currentView === 'receipts'
                     ? 'bg-[#D4AF37] text-slate-950'

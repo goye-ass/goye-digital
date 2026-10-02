@@ -106,7 +106,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
       const data = await res.json();
       if (!res.ok) {
-        throw new Error(data.error || 'Payment initialization failed.');
+        throw new Error(data.details ? `${data.error}: ${data.details}` : data.error || 'Payment initialization failed.');
       }
 
       // If gateway returned a live checkout / authorization URL, redirect customer to live gateway

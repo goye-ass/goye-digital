@@ -63,6 +63,9 @@ export default function App() {
   const [checkoutProduct, setCheckoutProduct] = useState<DigitalProduct | null>(null);
   const [checkoutGateway, setCheckoutGateway] = useState<'PAYSTACK' | 'FLUTTERWAVE'>('PAYSTACK');
   const [showAdminPortal, setShowAdminPortal] = useState(false);
+  const [adminInitialView, setAdminInitialView] = useState<
+    'dashboard' | 'products' | 'new_product' | 'orders' | 'notifications' | 'receipts'
+  >('dashboard');
   const [showCustomerDashboard, setShowCustomerDashboard] = useState(false);
   const [activePolicy, setActivePolicy] = useState<'license' | 'refund' | 'terms' | 'privacy' | null>(null);
 
@@ -70,21 +73,89 @@ export default function App() {
   const [downloadOrderId, setDownloadOrderId] = useState<string | null>(null);
 
   // Check URL pathname for direct routes
-  useEffect(() => {
-    const handleUrlRoute = () => {
-      const path = window.location.pathname;
-      if (path.startsWith('/download/')) {
-        const orderId = path.replace('/download/', '').split('?')[0];
-        if (orderId) setDownloadOrderId(orderId);
-      } else if (path === '/admin') {
-        setShowAdminPortal(true);
+  const handleUrlRoute = (productList: DigitalProduct[] = products) => {
+    const path = window.location.pathname;
+    if (path.startsWith('/download/')) {
+      const orderId = path.replace('/download/', '').split('?')[0];
+      if (orderId) setDownloadOrderId(orderId);
+    } else if (path === '/download') {
+      setShowCustomerDashboard(true);
+    } else if (path.startsWith('/product/')) {
+      const id = path.replace('/product/', '').split('?')[0];
+      const prod = productList.find(p => p.product_id === id || (p as any).id === id);
+      if (prod) {
+        setSelectedProduct(prod);
       }
-    };
+    } else if (path.startsWith('/checkout/')) {
+      const id = path.replace('/checkout/', '').split('?')[0];
+      const prod = productList.find(p => p.product_id === id || (p as any).id === id);
+      if (prod) {
+        setCheckoutProduct(prod);
+      }
+    } else if (path.startsWith('/admin')) {
+      setShowAdminPortal(true);
+      if (path === '/admin/products/new') {
+        setAdminInitialView('new_product');
+      } else if (path === '/admin/products') {
+        setAdminInitialView('products');
+      } else if (path === '/admin/orders') {
+        setAdminInitialView('orders');
+      } else if (path === '/admin/notifications') {
+        setAdminInitialView('notifications');
+      } else if (path === '/admin/receipts') {
+        setAdminInitialView('receipts');
+      } else {
+        setAdminInitialView('dashboard');
+      }
+    }
+  };
 
+  useEffect(() => {
     handleUrlRoute();
-    window.addEventListener('popstate', handleUrlRoute);
-    return () => window.removeEventListener('popstate', handleUrlRoute);
-  }, []);
+    const onPop = () => handleUrlRoute();
+    window.addEventListener('popstate', onPop);
+    return () => window.removeEventListener('popstate', onPop);
+  }, [products]);
+
+  const handleOpenProduct = (p: DigitalProduct) => {
+    setSelectedProduct(p);
+    window.history.pushState(null, '', `/product/${p.product_id}`);
+  };
+
+  const handleCloseProduct = () => {
+    setSelectedProduct(null);
+    if (window.location.pathname.startsWith('/product/')) {
+      window.history.pushState(null, '', '/');
+    }
+  };
+
+  const handleOpenCheckout = (p: DigitalProduct, gateway: 'PAYSTACK' | 'FLUTTERWAVE' = 'PAYSTACK') => {
+    setSelectedProduct(null);
+    setCheckoutProduct(p);
+    setCheckoutGateway(gateway);
+    window.history.pushState(null, '', `/checkout/${p.product_id}`);
+  };
+
+  const handleCloseCheckout = () => {
+    setCheckoutProduct(null);
+    if (window.location.pathname.startsWith('/checkout/')) {
+      window.history.pushState(null, '', '/');
+    }
+  };
+
+  const handleOpenAdmin = (view: 'dashboard' | 'products' | 'new_product' | 'orders' | 'notifications' | 'receipts' = 'dashboard') => {
+    setAdminInitialView(view);
+    setShowAdminPortal(true);
+    const path = view === 'dashboard' ? '/admin' : `/admin/${view === 'new_product' ? 'products/new' : view}`;
+    window.history.pushState(null, '', path);
+  };
+
+  const handleCloseAdmin = () => {
+    setShowAdminPortal(false);
+    if (window.location.pathname.startsWith('/admin')) {
+      window.history.pushState(null, '', '/');
+    }
+  };
 
   // Save fastMode preference
   useEffect(() => {
@@ -100,6 +171,7 @@ export default function App() {
         if (Array.isArray(parsed) && parsed.length > 0) {
           setProducts(parsed);
           setIsLoading(false);
+          handleUrlRoute(parsed);
         }
       }
       const cachedSet = localStorage.getItem('goye_cached_settings');
@@ -122,6 +194,7 @@ export default function App() {
       if (prodRes.ok) {
         const prodData = await prodRes.json();
         setProducts(prodData);
+        handleUrlRoute(prodData);
         try {
           localStorage.setItem('goye_cached_products', JSON.stringify(prodData));
         } catch {}
@@ -243,8 +316,11 @@ export default function App() {
           setActiveNavTab(tab as any);
           if (tab === 'catalog') setSelectedCategory('ALL');
         }}
-        onOpenAdmin={() => setShowAdminPortal(true)}
-        onOpenCustomerDashboard={() => setShowCustomerDashboard(true)}
+        onOpenAdmin={() => handleOpenAdmin('dashboard')}
+        onOpenCustomerDashboard={() => {
+          setShowCustomerDashboard(true);
+          window.history.pushState(null, '', '/download');
+        }}
       />
 
       {/* Main Content Area */}
@@ -289,11 +365,8 @@ export default function App() {
                     <ProductCard
                       key={product.product_id}
                       product={product}
-                      onSelect={(p) => setSelectedProduct(p)}
-                      onBuyNow={(p) => {
-                        setCheckoutProduct(p);
-                        setCheckoutGateway('PAYSTACK');
-                      }}
+                      onSelect={(p) => handleOpenProduct(p)}
+                      onBuyNow={(p) => handleOpenCheckout(p, 'PAYSTACK')}
                     />
                   ))}
                 </div>
@@ -365,7 +438,7 @@ export default function App() {
                     return (
                       <div
                         key={product.product_id || product.id}
-                        onClick={() => setSelectedProduct(product)}
+                        onClick={() => handleOpenProduct(product)}
                         className="p-4 bg-[#121722] border border-[#1E283D] hover:border-[#D4AF37] rounded-xl flex items-center justify-between gap-4 cursor-pointer transition-colors shadow-sm"
                       >
                         <div className="space-y-1 min-w-0 flex-1">
@@ -389,8 +462,7 @@ export default function App() {
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              setCheckoutProduct(product);
-                              setCheckoutGateway('PAYSTACK');
+                              handleOpenCheckout(product, 'PAYSTACK');
                             }}
                             className="px-3.5 py-1.5 bg-[#D4AF37] hover:bg-[#E5BE48] text-slate-950 font-bold text-xs rounded-lg cursor-pointer shadow-sm"
                           >
@@ -408,11 +480,8 @@ export default function App() {
                     <ProductCard
                       key={product.product_id || product.id}
                       product={product}
-                      onSelect={(p) => setSelectedProduct(p)}
-                      onBuyNow={(p) => {
-                        setCheckoutProduct(p);
-                        setCheckoutGateway('PAYSTACK');
-                      }}
+                      onSelect={(p) => handleOpenProduct(p)}
+                      onBuyNow={(p) => handleOpenCheckout(p, 'PAYSTACK')}
                     />
                   ))}
                 </div>
@@ -532,12 +601,8 @@ export default function App() {
       {selectedProduct && (
         <ProductModal
           product={selectedProduct}
-          onClose={() => setSelectedProduct(null)}
-          onInitiateCheckout={(p, gateway) => {
-            setSelectedProduct(null);
-            setCheckoutProduct(p);
-            setCheckoutGateway(gateway);
-          }}
+          onClose={handleCloseProduct}
+          onInitiateCheckout={(p, gateway) => handleOpenCheckout(p, gateway)}
           onOpenPolicy={(policy) => setActivePolicy(policy)}
           settings={settings}
         />
@@ -548,7 +613,7 @@ export default function App() {
         <CheckoutModal
           product={checkoutProduct}
           initialGateway={checkoutGateway}
-          onClose={() => setCheckoutProduct(null)}
+          onClose={handleCloseCheckout}
           settings={settings}
           onOrderSuccess={(orderId, downloadUrl) => {
             loadMarketplaceData();
@@ -558,14 +623,22 @@ export default function App() {
 
       {/* Customer Orders & Download Lookup Modal */}
       {showCustomerDashboard && (
-        <CustomerDashboard onClose={() => setShowCustomerDashboard(false)} />
+        <CustomerDashboard
+          onClose={() => {
+            setShowCustomerDashboard(false);
+            if (window.location.pathname === '/download') {
+              window.history.pushState(null, '', '/');
+            }
+          }}
+        />
       )}
 
       {/* Admin Management Portal Modal (/admin, /admin/products, /admin/products/new, /admin/orders) */}
       {showAdminPortal && (
         <AdminPortal
-          onClose={() => setShowAdminPortal(false)}
+          onClose={handleCloseAdmin}
           onRefreshPublicData={loadMarketplaceData}
+          initialView={adminInitialView}
         />
       )}
 
@@ -594,7 +667,10 @@ export default function App() {
         </button>
 
         <button
-          onClick={() => setShowCustomerDashboard(true)}
+          onClick={() => {
+            setShowCustomerDashboard(true);
+            window.history.pushState(null, '', '/download');
+          }}
           className="flex flex-col items-center gap-1 py-1 px-2 text-[10px] font-semibold text-slate-400 hover:text-[#D4AF37] transition-colors cursor-pointer"
         >
           <DownloadCloud className="w-4 h-4" />
@@ -612,7 +688,7 @@ export default function App() {
         </button>
 
         <button
-          onClick={() => setShowAdminPortal(true)}
+          onClick={() => handleOpenAdmin('dashboard')}
           className="flex flex-col items-center gap-1 py-1 px-2 text-[10px] font-semibold text-slate-400 hover:text-white transition-colors cursor-pointer"
         >
           <ShieldCheck className="w-4 h-4" />
