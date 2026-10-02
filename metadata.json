@@ -1,0 +1,6 @@
+{
+  "name": "GOYE Digital Marketplace",
+  "description": "Original digital tools, business templates, AI resources, and professional guides created or legally licensed by GOYE.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,86 @@
+[
+  {
+    "id": "notif-mupyyxk0-dphu",
+    "type": "DOWNLOAD_ACCESSED",
+    "title": "File Download: Business Plan Template Complete",
+    "message": "Order ORD-GOYE-2026-001 downloaded by Babatunde Lawal (babatunde@lawalholdings.ng). IP: 127.0.0.1. Format: DOCX.",
+    "timestamp": "2026-10-01T20:11:11.328Z",
+    "read": false,
+    "metadata": {
+      "order_id": "ORD-GOYE-2026-001",
+      "product_id": "P-GOYE-001",
+      "customer_email": "babatunde@lawalholdings.ng",
+      "customer_name": "Babatunde Lawal"
+    }
+  },
+  {
+    "id": "notif-mupyyqrt-zsaj",
+    "type": "ORDER_PAID",
+    "title": "Receipt Resent: #REC-GOYE-2026-001",
+    "message": "Commercial receipt re-dispatched to Babatunde Lawal (babatunde@lawalholdings.ng) for Business Plan Template Complete.",
+    "timestamp": "2026-10-01T20:11:02.537Z",
+    "read": false,
+    "metadata": {
+      "order_id": "ORD-GOYE-2026-001",
+      "product_id": "P-GOYE-001",
+      "amount": 2500,
+      "customer_email": "babatunde@lawalholdings.ng",
+      "customer_name": "Babatunde Lawal",
+      "gateway": "PAYSTACK"
+    }
+  },
+  {
+    "id": "notif-mupyyheo-dzod",
+    "type": "ORDER_PAID",
+    "title": "Verified Payment: ₦2,500",
+    "message": "Business Plan Template Complete purchased by Babatunde Lawal (babatunde@lawalholdings.ng) via PAYSTACK. Receipt #REC-GOYE-2026-001 generated.",
+    "timestamp": "2026-10-01T20:10:50.400Z",
+    "read": false,
+    "metadata": {
+      "order_id": "ORD-GOYE-2026-001",
+      "product_id": "P-GOYE-001",
+      "amount": 2500,
+      "customer_email": "babatunde@lawalholdings.ng",
+      "customer_name": "Babatunde Lawal",
+      "gateway": "PAYSTACK"
+    }
+  },
+  {
+    "id": "notif-mupyy7dp-5hka",
+    "type": "ORDER_PAID",
+    "title": "Verified Payment: ₦25,000",
+    "message": "Comprehensive Startup Suite purchased via Paystack",
+    "timestamp": "2026-10-01T20:10:37.405Z",
+    "read": false,
+    "metadata": {
+      "order_id": "ORD-TEST-MUPYY7DP",
+      "amount": 15000,
+      "gateway": "PAYSTACK"
+    }
+  },
+  {
+    "id": "notif-mupyxdtv-8dgm",
+    "type": "SUPPORT_TICKET",
+    "title": "Support Ticket: Invoice Customization",
+    "message": "From Chinedu Obi (chinedu@example.com): \"Hello, can I use the XLSX Invoice template on Google Sheets?\"",
+    "timestamp": "2026-10-01T20:09:59.107Z",
+    "read": true,
+    "metadata": {
+      "customer_name": "Chinedu Obi",
+      "customer_email": "chinedu@example.com",
+      "ticket_subject": "Invoice Customization"
+    }
+  },
+  {
+    "id": "notif-mupywsqo-init1",
+    "type": "ORDER_PAID",
+    "title": "System Initialized: 20 Products Ready",
+    "message": "All 20 GOYE digital products are active with OWNED_BY_GOYE verified status.",
+    "timestamp": "2026-10-01T20:09:31.776Z",
+    "read": false,
+    "metadata": {
+      "amount": 0,
+      "gateway": "PAYSTACK"
+    }
+  }
+]

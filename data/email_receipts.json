@@ -1,0 +1,26 @@
+[
+  {
+    "receipt_number": "REC-GOYE-2026-001",
+    "order_id": "ORD-GOYE-2026-001",
+    "issued_at": "2026-10-01T20:10:50.374Z",
+    "customer_name": "Babatunde Lawal",
+    "customer_email": "babatunde@lawalholdings.ng",
+    "product_id": "P-GOYE-001",
+    "product_name": "Business Plan Template Complete",
+    "category": "Business Templates",
+    "file_type": "DOCX",
+    "version": "1.0",
+    "amount": 2500,
+    "subtotal": 2500,
+    "vat_amount": 0,
+    "currency": "NGN",
+    "payment_method": "PAYSTACK",
+    "payment_reference": "REF-PSTK-99281726",
+    "download_url": "https://ais-dev-xh537slxp4ipzgwd6lauuf-709682529995.europe-west2.run.app/api/downloads/tok-test-sample-8827",
+    "download_expires_at": "2026-10-02T20:10:50.372Z",
+    "license_terms": "Single buyer license, commercial use allowed, no redistribution/resale of file itself",
+    "refund_policy_ref": "Digital product, no refund after download, defective file replacement within 7 days",
+    "support_email": "goyedagosmessenterprise@gmail.com",
+    "notes": "VAT 0% Exempt Digital Educational/Business Publication (Nigeria First Schedule VAT Act)"
+  }
+]
